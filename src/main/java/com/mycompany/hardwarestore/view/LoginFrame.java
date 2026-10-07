@@ -3,12 +3,21 @@
  * Click nbfs://nbhost/SystemFileSystem/Templates/GUIForms/JFrame.java to edit this template
  */
 package com.mycompany.hardwarestore.view;
+import com.mycompany.hardwarestore.model.User;
+import com.mycompany.hardwarestore.service.AuthService;
+
+import java.sql.SQLException;
+import javax.swing.JOptionPane;
+import com.mycompany.hardwarestore.view.admin.AdminDashboardFrame;
+import com.mycompany.hardwarestore.view.customer.CustomerDashboardFrame;
 
 /**
  *
  * @author navod
  */
 public class LoginFrame extends javax.swing.JFrame {
+        private final AuthService authService = new AuthService();
+
     
     private static final java.util.logging.Logger logger = java.util.logging.Logger.getLogger(LoginFrame.class.getName());
 
@@ -32,9 +41,9 @@ public class LoginFrame extends javax.swing.JFrame {
         jLabel2 = new javax.swing.JLabel();
         jLabel3 = new javax.swing.JLabel();
         jLabel4 = new javax.swing.JLabel();
-        jTextField1 = new javax.swing.JTextField();
-        jTextField2 = new javax.swing.JTextField();
-        jButton1 = new javax.swing.JButton();
+        txtUsername = new javax.swing.JTextField();
+        btnLogin = new javax.swing.JButton();
+        txtPassword = new javax.swing.JPasswordField();
 
         setDefaultCloseOperation(javax.swing.WindowConstants.EXIT_ON_CLOSE);
 
@@ -47,14 +56,14 @@ public class LoginFrame extends javax.swing.JFrame {
 
         jLabel4.setText("Password");
 
-        jTextField1.setToolTipText("");
-        jTextField1.addActionListener(this::jTextField1ActionPerformed);
+        txtUsername.setToolTipText("");
+        txtUsername.addActionListener(this::txtUsernameActionPerformed);
 
-        jTextField2.addActionListener(this::jTextField2ActionPerformed);
+        btnLogin.setActionCommand("btnlogin");
+        btnLogin.setLabel("Login");
+        btnLogin.addActionListener(this::btnLoginActionPerformed);
 
-        jButton1.setActionCommand("btnlogin");
-        jButton1.setLabel("Login");
-        jButton1.addActionListener(this::jButton1ActionPerformed);
+        txtPassword.setText("jPasswordField1");
 
         javax.swing.GroupLayout layout = new javax.swing.GroupLayout(getContentPane());
         getContentPane().setLayout(layout);
@@ -69,15 +78,15 @@ public class LoginFrame extends javax.swing.JFrame {
             .addGroup(layout.createSequentialGroup()
                 .addGap(38, 38, 38)
                 .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.TRAILING)
-                    .addComponent(jButton1)
+                    .addComponent(btnLogin)
                     .addGroup(layout.createSequentialGroup()
                         .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
                             .addComponent(jLabel3)
                             .addComponent(jLabel4))
                         .addGap(34, 34, 34)
-                        .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                            .addComponent(jTextField2, javax.swing.GroupLayout.PREFERRED_SIZE, 126, javax.swing.GroupLayout.PREFERRED_SIZE)
-                            .addComponent(jTextField1, javax.swing.GroupLayout.PREFERRED_SIZE, 126, javax.swing.GroupLayout.PREFERRED_SIZE))))
+                        .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING, false)
+                            .addComponent(txtUsername, javax.swing.GroupLayout.DEFAULT_SIZE, 126, Short.MAX_VALUE)
+                            .addComponent(txtPassword))))
                 .addContainerGap(javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
         );
         layout.setVerticalGroup(
@@ -90,30 +99,90 @@ public class LoginFrame extends javax.swing.JFrame {
                 .addGap(38, 38, 38)
                 .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
                     .addComponent(jLabel3)
-                    .addComponent(jTextField1, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
+                    .addComponent(txtUsername, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
                 .addGap(18, 18, 18)
                 .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
                     .addComponent(jLabel4)
-                    .addComponent(jTextField2, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
+                    .addComponent(txtPassword, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
                 .addGap(18, 18, 18)
-                .addComponent(jButton1)
+                .addComponent(btnLogin)
                 .addContainerGap(78, Short.MAX_VALUE))
         );
+
+        txtUsername.getAccessibleContext().setAccessibleName("txtUser");
 
         pack();
     }// </editor-fold>//GEN-END:initComponents
 
-    private void jTextField1ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jTextField1ActionPerformed
+    private void txtUsernameActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_txtUsernameActionPerformed
         // TODO add your handling code here:
-    }//GEN-LAST:event_jTextField1ActionPerformed
+    }//GEN-LAST:event_txtUsernameActionPerformed
 
-    private void jTextField2ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jTextField2ActionPerformed
+    private void btnLoginActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnLoginActionPerformed
         // TODO add your handling code here:
-    }//GEN-LAST:event_jTextField2ActionPerformed
+        String username = txtUsername.getText().trim();
+        String password = new String(txtPassword.getPassword());
 
-    private void jButton1ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jButton1ActionPerformed
-        // TODO add your handling code here:
-    }//GEN-LAST:event_jButton1ActionPerformed
+try {
+
+    User user = authService.login(username, password);
+    
+    if (user != null) {
+
+    if (user.getRole().equals("ADMIN")) {
+
+        AdminDashboardFrame adminDashboard =
+                new AdminDashboardFrame();
+
+        adminDashboard.setVisible(true);
+
+        this.dispose();
+
+    } else if (user.getRole().equals("CUSTOMER")) {
+
+        CustomerDashboardFrame customerDashboard =
+                new CustomerDashboardFrame();
+
+        customerDashboard.setVisible(true);
+
+        this.dispose();
+    }
+
+}
+
+
+    else {
+
+        JOptionPane.showMessageDialog(
+                this,
+                "Invalid username or password.",
+                "Login Failed",
+                JOptionPane.ERROR_MESSAGE
+        );
+    }
+
+} catch (IllegalArgumentException e) {
+
+    JOptionPane.showMessageDialog(
+            this,
+            e.getMessage(),
+            "Validation Error",
+            JOptionPane.WARNING_MESSAGE
+    );
+
+} catch (SQLException e) {
+
+    JOptionPane.showMessageDialog(
+            this,
+            "Database error: " + e.getMessage(),
+            "Database Error",
+            JOptionPane.ERROR_MESSAGE
+    );
+
+    e.printStackTrace();
+}
+        
+    }//GEN-LAST:event_btnLoginActionPerformed
 
     /**
      * @param args the command line arguments
@@ -141,12 +210,12 @@ public class LoginFrame extends javax.swing.JFrame {
     }
 
     // Variables declaration - do not modify//GEN-BEGIN:variables
-    private javax.swing.JButton jButton1;
+    private javax.swing.JButton btnLogin;
     private javax.swing.JLabel jLabel1;
     private javax.swing.JLabel jLabel2;
     private javax.swing.JLabel jLabel3;
     private javax.swing.JLabel jLabel4;
-    private javax.swing.JTextField jTextField1;
-    private javax.swing.JTextField jTextField2;
+    private javax.swing.JPasswordField txtPassword;
+    private javax.swing.JTextField txtUsername;
     // End of variables declaration//GEN-END:variables
 }

@@ -1,5 +1,7 @@
 D:\NIBM\Repeats\EAD1\HardwareStore\src\main\java\com\mycompany\hardwarestore\config\DBConnection.java
+D:\NIBM\Repeats\EAD1\HardwareStore\src\main\java\com\mycompany\hardwarestore\dao\CategoryDAO.java
 D:\NIBM\Repeats\EAD1\HardwareStore\src\main\java\com\mycompany\hardwarestore\dao\CustomerDAO.java
+D:\NIBM\Repeats\EAD1\HardwareStore\src\main\java\com\mycompany\hardwarestore\dao\DashboardDAO.java
 D:\NIBM\Repeats\EAD1\HardwareStore\src\main\java\com\mycompany\hardwarestore\dao\OrderDAO.java
 D:\NIBM\Repeats\EAD1\HardwareStore\src\main\java\com\mycompany\hardwarestore\dao\ProductDAO.java
 D:\NIBM\Repeats\EAD1\HardwareStore\src\main\java\com\mycompany\hardwarestore\dao\UserDAO.java
@@ -15,4 +17,8 @@ D:\NIBM\Repeats\EAD1\HardwareStore\src\main\java\com\mycompany\hardwarestore\mod
 D:\NIBM\Repeats\EAD1\HardwareStore\src\main\java\com\mycompany\hardwarestore\model\User.java
 D:\NIBM\Repeats\EAD1\HardwareStore\src\main\java\com\mycompany\hardwarestore\service\AuthService.java
 D:\NIBM\Repeats\EAD1\HardwareStore\src\main\java\com\mycompany\hardwarestore\service\CheckoutService.java
+D:\NIBM\Repeats\EAD1\HardwareStore\src\main\java\com\mycompany\hardwarestore\view\admin\AdminDashboardFrame.java
+D:\NIBM\Repeats\EAD1\HardwareStore\src\main\java\com\mycompany\hardwarestore\view\admin\DashboardPanel.java
+D:\NIBM\Repeats\EAD1\HardwareStore\src\main\java\com\mycompany\hardwarestore\view\admin\ProductPanel.java
+D:\NIBM\Repeats\EAD1\HardwareStore\src\main\java\com\mycompany\hardwarestore\view\customer\CustomerDashboardFrame.java
 D:\NIBM\Repeats\EAD1\HardwareStore\src\main\java\com\mycompany\hardwarestore\view\LoginFrame.java
