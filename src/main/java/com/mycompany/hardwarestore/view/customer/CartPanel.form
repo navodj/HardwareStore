@@ -149,16 +149,25 @@
       <Properties>
         <Property name="text" type="java.lang.String" value="Remove Item"/>
       </Properties>
+      <Events>
+        <EventHandler event="actionPerformed" listener="java.awt.event.ActionListener" parameters="java.awt.event.ActionEvent" handler="btnRemoveActionPerformed"/>
+      </Events>
     </Component>
     <Component class="javax.swing.JButton" name="btnClearCart">
       <Properties>
         <Property name="text" type="java.lang.String" value="Clear cart"/>
       </Properties>
+      <Events>
+        <EventHandler event="actionPerformed" listener="java.awt.event.ActionListener" parameters="java.awt.event.ActionEvent" handler="btnClearCartActionPerformed"/>
+      </Events>
     </Component>
     <Component class="javax.swing.JButton" name="btnCheckout">
       <Properties>
         <Property name="text" type="java.lang.String" value="Proceed to checkout"/>
       </Properties>
+      <Events>
+        <EventHandler event="actionPerformed" listener="java.awt.event.ActionListener" parameters="java.awt.event.ActionEvent" handler="btnCheckoutActionPerformed"/>
+      </Events>
     </Component>
   </SubComponents>
 </Form>

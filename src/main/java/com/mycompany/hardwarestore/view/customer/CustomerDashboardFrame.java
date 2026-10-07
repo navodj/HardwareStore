@@ -6,6 +6,7 @@ package com.mycompany.hardwarestore.view.customer;
 
 import com.mycompany.hardwarestore.view.LoginFrame;
 import javax.swing.JOptionPane;
+import com.mycompany.hardwarestore.model.User;
 import com.mycompany.hardwarestore.service.CartService;
 
 /**
@@ -19,12 +20,22 @@ public class CustomerDashboardFrame extends javax.swing.JFrame {
     /**
      * Creates new form CustomerDashboardFrame
      */
+    private final User loggedInUser;
     private final CartService cartService = new CartService();
 
     public CustomerDashboardFrame() {
+        this(null);
+    }
+
+    public CustomerDashboardFrame(User user) {
+
+        this.loggedInUser = user;
+
         initComponents();
+
         setSize(1000, 650);
         setLocationRelativeTo(null);
+
         showPanel(new CustomerProductPanel(cartService));
     }
 
@@ -61,6 +72,7 @@ public class CustomerDashboardFrame extends javax.swing.JFrame {
         btnCart.addActionListener(this::btnCartActionPerformed);
 
         btnMyOrders.setText("My Orders");
+        btnMyOrders.addActionListener(this::btnMyOrdersActionPerformed);
 
         btnLogout.setText("Logout");
         btnLogout.addActionListener(this::btnLogoutActionPerformed);
@@ -127,9 +139,9 @@ public class CustomerDashboardFrame extends javax.swing.JFrame {
 
     private void btnProductsActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnProductsActionPerformed
         // TODO add your handling code here:
-            showPanel(
-            new CustomerProductPanel(cartService)
-    );
+        showPanel(
+                new CustomerProductPanel(cartService)
+        );
     }//GEN-LAST:event_btnProductsActionPerformed
 
     private void btnLogoutActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnLogoutActionPerformed
@@ -156,10 +168,18 @@ public class CustomerDashboardFrame extends javax.swing.JFrame {
 
     private void btnCartActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnCartActionPerformed
         // TODO add your handling code here:
-        showPanel(new CartPanel(cartService));
-        
+        showPanel(
+                new CartPanel(cartService, loggedInUser)
+        );
 
     }//GEN-LAST:event_btnCartActionPerformed
+
+    private void btnMyOrdersActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnMyOrdersActionPerformed
+        // TODO add your handling code here:
+        showPanel(
+        new MyOrdersPanel(loggedInUser)
+);
+    }//GEN-LAST:event_btnMyOrdersActionPerformed
 
     /**
      * @param args the command line arguments

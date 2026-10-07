@@ -24,6 +24,7 @@ com\mycompany\hardwarestore\model\Product.class
 com\mycompany\hardwarestore\dao\OrderDAO.class
 com\mycompany\hardwarestore\service\CartService.class
 com\mycompany\hardwarestore\view\admin\ProductPanel$1.class
+com\mycompany\hardwarestore\view\customer\MyOrdersPanel.class
 com\mycompany\hardwarestore\model\CartItem.class
 com\mycompany\hardwarestore\model\Customer.class
 com\mycompany\hardwarestore\service\CheckoutService.class

@@ -7,9 +7,14 @@ package com.mycompany.hardwarestore.view.customer;
 import com.mycompany.hardwarestore.model.CartItem;
 import com.mycompany.hardwarestore.service.CartService;
 
+import javax.swing.JOptionPane;
 import java.util.List;
 
 import javax.swing.table.DefaultTableModel;
+import com.mycompany.hardwarestore.model.User;
+
+import com.mycompany.hardwarestore.dao.CustomerDAO;
+import com.mycompany.hardwarestore.service.CheckoutService;
 
 /**
  *
@@ -21,9 +26,17 @@ public class CartPanel extends javax.swing.JPanel {
      * Creates new form CartPanel
      */
     private final CartService cartService;
-    
-    public CartPanel(CartService cartService) {
+    private final User loggedInUser;
+
+    private final CustomerDAO customerDAO = new CustomerDAO();
+    private final CheckoutService checkoutService = new CheckoutService();
+
+    public CartPanel(
+            CartService cartService,
+            User loggedInUser) {
+
         this.cartService = cartService;
+        this.loggedInUser = loggedInUser;
 
         initComponents();
         loadCart();
@@ -100,10 +113,13 @@ public class CartPanel extends javax.swing.JPanel {
         lblTotal.setText("LKR 25,000.00");
 
         btnRemove.setText("Remove Item");
+        btnRemove.addActionListener(this::btnRemoveActionPerformed);
 
         btnClearCart.setText("Clear cart");
+        btnClearCart.addActionListener(this::btnClearCartActionPerformed);
 
         btnCheckout.setText("Proceed to checkout");
+        btnCheckout.addActionListener(this::btnCheckoutActionPerformed);
 
         javax.swing.GroupLayout layout = new javax.swing.GroupLayout(this);
         this.setLayout(layout);
@@ -156,6 +172,156 @@ public class CartPanel extends javax.swing.JPanel {
                 .addContainerGap(148, Short.MAX_VALUE))
         );
     }// </editor-fold>//GEN-END:initComponents
+
+    private void btnRemoveActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnRemoveActionPerformed
+        // TODO add your handling code here:
+        int selectedRow = tblCart.getSelectedRow();
+
+        if (selectedRow == -1) {
+
+            JOptionPane.showMessageDialog(
+                    this,
+                    "Please select an item from the cart first.",
+                    "No Item Selected",
+                    JOptionPane.WARNING_MESSAGE
+            );
+
+            return;
+        }
+
+        CartItem selectedItem
+                = cartService.getCartItems().get(selectedRow);
+
+        int choice = JOptionPane.showConfirmDialog(
+                this,
+                "Remove "
+                + selectedItem.getProduct().getProductName()
+                + " from the cart?",
+                "Remove Item",
+                JOptionPane.YES_NO_OPTION
+        );
+
+        if (choice == JOptionPane.YES_OPTION) {
+
+            cartService.removeItem(
+                    selectedItem.getProduct().getProductId()
+            );
+
+            loadCart();
+        }
+    }//GEN-LAST:event_btnRemoveActionPerformed
+
+    private void btnClearCartActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnClearCartActionPerformed
+        // TODO add your handling code here:
+        if (cartService.getCartItems().isEmpty()) {
+
+            JOptionPane.showMessageDialog(
+                    this,
+                    "The cart is already empty.",
+                    "Cart",
+                    JOptionPane.INFORMATION_MESSAGE
+            );
+
+            return;
+        }
+
+        int choice = JOptionPane.showConfirmDialog(
+                this,
+                "Are you sure you want to clear the entire cart?",
+                "Clear Cart",
+                JOptionPane.YES_NO_OPTION
+        );
+
+        if (choice == JOptionPane.YES_OPTION) {
+
+            cartService.clearCart();
+
+            loadCart();
+        }
+    }//GEN-LAST:event_btnClearCartActionPerformed
+
+    private void btnCheckoutActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnCheckoutActionPerformed
+        // TODO add your handling code here:
+        if (cartService.getCartItems().isEmpty()) {
+
+            JOptionPane.showMessageDialog(
+                    this,
+                    "Your cart is empty.",
+                    "Checkout",
+                    JOptionPane.WARNING_MESSAGE
+            );
+
+            return;
+        }
+        String[] paymentOptions = {
+            "CASH",
+            "CARD"
+        };
+
+        String paymentMethod
+                = (String) JOptionPane.showInputDialog(
+                        this,
+                        "Select payment method:",
+                        "Checkout",
+                        JOptionPane.QUESTION_MESSAGE,
+                        null,
+                        paymentOptions,
+                        paymentOptions[0]
+                );
+
+        try {
+
+            int customerId
+                    = customerDAO.getCustomerIdByUserId(
+                            loggedInUser.getUserId()
+                    );
+            if (customerId == -1) {
+
+                JOptionPane.showMessageDialog(
+                        this,
+                        "Customer account could not be found.",
+                        "Checkout Error",
+                        JOptionPane.ERROR_MESSAGE
+                );
+
+                return;
+            }
+            int orderId = checkoutService.checkout(
+                    customerId,
+                    cartService.getCartItems(),
+                    paymentMethod
+            );
+            JOptionPane.showMessageDialog(
+                    this,
+                    "Payment Successful!\n"
+                    + "Order ID: " + orderId,
+                    "Order Completed",
+                    JOptionPane.INFORMATION_MESSAGE
+            );
+            cartService.clearCart();
+            loadCart();
+        } catch (IllegalArgumentException e) {
+
+            JOptionPane.showMessageDialog(
+                    this,
+                    e.getMessage(),
+                    "Checkout Error",
+                    JOptionPane.WARNING_MESSAGE
+            );
+
+        } catch (java.sql.SQLException e) {
+
+            JOptionPane.showMessageDialog(
+                    this,
+                    "Checkout failed.\n"
+                    + e.getMessage(),
+                    "Database Error",
+                    JOptionPane.ERROR_MESSAGE
+            );
+
+            e.printStackTrace();
+        }
+    }//GEN-LAST:event_btnCheckoutActionPerformed
 
 
     // Variables declaration - do not modify//GEN-BEGIN:variables

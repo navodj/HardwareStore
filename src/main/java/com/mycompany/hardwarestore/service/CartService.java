@@ -32,16 +32,27 @@ public class CartService {
         CartItem item = new CartItem(product, quantity);
         cartItems.add(item);
     }
-    
+
     public int getQuantityForProduct(int productId) {
 
-    for (CartItem item : cartItems) {
+        for (CartItem item : cartItems) {
 
-        if (item.getProduct().getProductId() == productId) {
-            return item.getQuantity();
+            if (item.getProduct().getProductId() == productId) {
+                return item.getQuantity();
+            }
         }
+
+        return 0;
     }
 
-    return 0;
+    public void removeItem(int productId) {
+
+        cartItems.removeIf(
+                item -> item.getProduct().getProductId() == productId
+        );
+    }
+    
+    public void clearCart() {
+    cartItems.clear();
 }
 }

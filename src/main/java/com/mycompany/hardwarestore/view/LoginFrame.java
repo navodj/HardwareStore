@@ -141,7 +141,7 @@ try {
     } else if (user.getRole().equals("CUSTOMER")) {
 
         CustomerDashboardFrame customerDashboard =
-                new CustomerDashboardFrame();
+                new CustomerDashboardFrame(user);
 
         customerDashboard.setVisible(true);
 
