@@ -3,12 +3,13 @@
  * Click nbfs://nbhost/SystemFileSystem/Templates/GUIForms/JPanel.java to edit this template
  */
 package com.mycompany.hardwarestore.view.admin;
+
 import com.mycompany.hardwarestore.dao.ProductDAO;
 import com.mycompany.hardwarestore.model.Product;
 
 import java.sql.SQLException;
 import java.util.List;
-
+import java.util.ArrayList;
 import com.mycompany.hardwarestore.dao.CategoryDAO;
 import com.mycompany.hardwarestore.model.Category;
 
@@ -20,88 +21,107 @@ import javax.swing.table.DefaultTableModel;
  * @author navod
  */
 public class ProductPanel extends javax.swing.JPanel {
+
     private final ProductDAO productDAO = new ProductDAO();
     private final CategoryDAO categoryDAO = new CategoryDAO();
+    private List<Product> productList = new ArrayList<>();
+    private Product selectedProduct = null;
+
+    //clear form function
+    private void clearForm() {
+
+        txtProductName.setText("");
+        txtDescription.setText("");
+        txtPrice.setText("");
+        txtStock.setText("");
+
+        if (cmbCategory.getItemCount() > 0) {
+            cmbCategory.setSelectedIndex(0);
+        }
+
+        tblProducts.clearSelection();
+
+        selectedProduct = null;
+    }
 
     /**
      * Creates new form ProductPanel
      */
     private void loadProducts() {
 
-    try {
+        try {
 
-        List<Product> products = productDAO.getAllProducts();
+            productList = productDAO.getAllProducts();
+            DefaultTableModel model
+                    = (DefaultTableModel) tblProducts.getModel();
 
-        DefaultTableModel model =
-                (DefaultTableModel) tblProducts.getModel();
+            model.setRowCount(0);
 
-        model.setRowCount(0);
+            for (Product product : productList) {
 
-        for (Product product : products) {
+                String status;
 
-            String status;
+                if (product.isActive()) {
+                    status = "Active";
+                } else {
+                    status = "Inactive";
+                }
 
-            if (product.isActive()) {
-                status = "Active";
-            } else {
-                status = "Inactive";
+                model.addRow(new Object[]{
+                    product.getProductId(),
+                    product.getProductName(),
+                    product.getCategoryName(),
+                    String.format("LKR %,.2f", product.getPrice()),
+                    product.getStockQuantity(),
+                    status
+                });
             }
 
-            model.addRow(new Object[]{
-                product.getProductId(),
-                product.getProductName(),
-                product.getCategoryName(),
-                String.format("LKR %,.2f", product.getPrice()),
-                product.getStockQuantity(),
-                status
-            });
+        } catch (SQLException e) {
+
+            JOptionPane.showMessageDialog(
+                    this,
+                    "Failed to load products.\n" + e.getMessage(),
+                    "Database Error",
+                    JOptionPane.ERROR_MESSAGE
+            );
+
+            e.printStackTrace();
         }
-
-    } catch (SQLException e) {
-
-        JOptionPane.showMessageDialog(
-                this,
-                "Failed to load products.\n" + e.getMessage(),
-                "Database Error",
-                JOptionPane.ERROR_MESSAGE
-        );
-
-        e.printStackTrace();
     }
-}
-    
+
     private void loadCategories() {
 
-    try {
+        try {
 
-        List<Category> categories =
-                categoryDAO.getAllCategories();
+            List<Category> categories
+                    = categoryDAO.getAllCategories();
 
-        cmbCategory.removeAllItems();
+            cmbCategory.removeAllItems();
 
-        for (Category category : categories) {
-            cmbCategory.addItem(category);
+            for (Category category : categories) {
+                cmbCategory.addItem(category);
+            }
+
+        } catch (SQLException e) {
+
+            JOptionPane.showMessageDialog(
+                    this,
+                    "Failed to load categories.\n" + e.getMessage(),
+                    "Database Error",
+                    JOptionPane.ERROR_MESSAGE
+            );
+
+            e.printStackTrace();
         }
-
-    } catch (SQLException e) {
-
-        JOptionPane.showMessageDialog(
-                this,
-                "Failed to load categories.\n" + e.getMessage(),
-                "Database Error",
-                JOptionPane.ERROR_MESSAGE
-        );
-
-        e.printStackTrace();
     }
-}
-    
-public ProductPanel() {
-    initComponents();
-    loadProducts();
-    loadCategories();
 
-}
+    public ProductPanel() {
+        initComponents();
+        loadProducts();
+        loadCategories();
+
+    }
 
     /**
      * This method is called from within the constructor to initialize the form.
@@ -204,12 +224,16 @@ public ProductPanel() {
         txtStock.addActionListener(this::txtStockActionPerformed);
 
         btnAdd.setText("Add Product");
+        btnAdd.addActionListener(this::btnAddActionPerformed);
 
         btnUpdate.setText("Update Product");
+        btnUpdate.addActionListener(this::btnUpdateActionPerformed);
 
         btnDelete.setText("Delete Product");
+        btnDelete.addActionListener(this::btnDeleteActionPerformed);
 
         btnClear.setText("Clear");
+        btnClear.addActionListener(this::btnClearActionPerformed);
 
         jLabel7.setText("Search");
 
@@ -226,6 +250,11 @@ public ProductPanel() {
                 "Product ID", "Product", "Category", "Price", "Stock", "Status"
             }
         ));
+        tblProducts.addMouseListener(new java.awt.event.MouseAdapter() {
+            public void mouseClicked(java.awt.event.MouseEvent evt) {
+                tblProductsMouseClicked(evt);
+            }
+        });
         jScrollPane4.setViewportView(tblProducts);
 
         javax.swing.GroupLayout layout = new javax.swing.GroupLayout(this);
@@ -344,11 +373,400 @@ public ProductPanel() {
 
     private void txtSearchActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_txtSearchActionPerformed
         // TODO add your handling code here:
+        searchProducts();
     }//GEN-LAST:event_txtSearchActionPerformed
 
     private void cmbCategoryActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_cmbCategoryActionPerformed
         // TODO add your handling code here:
     }//GEN-LAST:event_cmbCategoryActionPerformed
+
+    private void btnAddActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnAddActionPerformed
+        // TODO add your handling code here:
+        String productName = txtProductName.getText().trim();
+        String description = txtDescription.getText().trim();
+        String priceText = txtPrice.getText().trim();
+        String stockText = txtStock.getText().trim();
+
+        Category selectedCategory
+                = (Category) cmbCategory.getSelectedItem();
+
+        if (productName.isEmpty()) {
+            JOptionPane.showMessageDialog(
+                    this,
+                    "Please enter the product name.",
+                    "Validation Error",
+                    JOptionPane.WARNING_MESSAGE
+            );
+            return;
+        }
+
+        if (selectedCategory == null) {
+            JOptionPane.showMessageDialog(
+                    this,
+                    "Please select a category.",
+                    "Validation Error",
+                    JOptionPane.WARNING_MESSAGE
+            );
+            return;
+        }
+
+        if (priceText.isEmpty()) {
+            JOptionPane.showMessageDialog(
+                    this,
+                    "Please enter the price.",
+                    "Validation Error",
+                    JOptionPane.WARNING_MESSAGE
+            );
+            return;
+        }
+
+        if (stockText.isEmpty()) {
+            JOptionPane.showMessageDialog(
+                    this,
+                    "Please enter the stock quantity.",
+                    "Validation Error",
+                    JOptionPane.WARNING_MESSAGE
+            );
+            return;
+        }
+        double price;
+        int stock;
+
+        try {
+            price = Double.parseDouble(priceText);
+            stock = Integer.parseInt(stockText);
+
+        } catch (NumberFormatException e) {
+
+            JOptionPane.showMessageDialog(
+                    this,
+                    "Price and stock must be valid numbers.",
+                    "Validation Error",
+                    JOptionPane.WARNING_MESSAGE
+            );
+
+            return;
+        }
+        if (price < 0) {
+            JOptionPane.showMessageDialog(
+                    this,
+                    "Price cannot be negative.",
+                    "Validation Error",
+                    JOptionPane.WARNING_MESSAGE
+            );
+            return;
+        }
+
+        if (stock < 0) {
+            JOptionPane.showMessageDialog(
+                    this,
+                    "Stock cannot be negative.",
+                    "Validation Error",
+                    JOptionPane.WARNING_MESSAGE
+            );
+            return;
+        }
+
+        Product product = new Product(
+                0,
+                selectedCategory.getCategoryId(),
+                selectedCategory.getCategoryName(),
+                productName,
+                description,
+                price,
+                stock,
+                true
+        );
+        try {
+
+            boolean added = productDAO.addProduct(product);
+
+            if (added) {
+
+                JOptionPane.showMessageDialog(
+                        this,
+                        "Product added successfully."
+                );
+
+                loadProducts();
+                clearForm();  //clearing the form after added
+
+            } else {
+
+                JOptionPane.showMessageDialog(
+                        this,
+                        "Product could not be added.",
+                        "Error",
+                        JOptionPane.ERROR_MESSAGE
+                );
+            }
+
+        } catch (SQLException e) {
+
+            JOptionPane.showMessageDialog(
+                    this,
+                    "Database error.\n" + e.getMessage(),
+                    "Database Error",
+                    JOptionPane.ERROR_MESSAGE
+            );
+
+            e.printStackTrace();
+        }
+    }//GEN-LAST:event_btnAddActionPerformed
+
+    private void tblProductsMouseClicked(java.awt.event.MouseEvent evt) {//GEN-FIRST:event_tblProductsMouseClicked
+        // TODO add your handling code here:
+        int selectedRow = tblProducts.getSelectedRow();
+
+        if (selectedRow == -1) {
+            return;
+        }
+        int productId = Integer.parseInt(
+                tblProducts.getValueAt(selectedRow, 0).toString()
+        );
+        for (Product product : productList) {
+
+            if (product.getProductId() == productId) {
+                selectedProduct = product;
+                break;
+            }
+        }
+        if (selectedProduct != null) {
+
+            txtProductName.setText(selectedProduct.getProductName());
+            txtDescription.setText(selectedProduct.getDescription());
+            txtPrice.setText(String.valueOf(selectedProduct.getPrice()));
+            txtStock.setText(String.valueOf(selectedProduct.getStockQuantity()));
+
+            for (int i = 0; i < cmbCategory.getItemCount(); i++) {
+
+                Category category = cmbCategory.getItemAt(i);
+
+                if (category.getCategoryId() == selectedProduct.getCategoryId()) {
+                    cmbCategory.setSelectedIndex(i);
+                    break;
+                }
+            }
+
+        }
+    }//GEN-LAST:event_tblProductsMouseClicked
+
+    private void btnClearActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnClearActionPerformed
+        // TODO add your handling code here:
+        clearForm();
+    }//GEN-LAST:event_btnClearActionPerformed
+
+    private void searchProducts() {
+
+        String keyword = txtSearch.getText().trim().toLowerCase();
+
+        DefaultTableModel model
+                = (DefaultTableModel) tblProducts.getModel();
+
+        model.setRowCount(0);
+
+        for (Product product : productList) {
+
+            String status = product.isActive()
+                    ? "Active"
+                    : "Inactive";
+
+            boolean matches
+                    = product.getProductName().toLowerCase().contains(keyword)
+                    || product.getCategoryName().toLowerCase().contains(keyword)
+                    || status.toLowerCase().contains(keyword);
+
+            if (matches) {
+
+                model.addRow(new Object[]{
+                    product.getProductId(),
+                    product.getProductName(),
+                    product.getCategoryName(),
+                    String.format("LKR %,.2f", product.getPrice()),
+                    product.getStockQuantity(),
+                    status
+                });
+            }
+        }
+    }
+    
+    private void btnUpdateActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnUpdateActionPerformed
+        // TODO add your handling code here:
+
+        //validate wheather the user selected from the table
+        if (selectedProduct == null) {
+            JOptionPane.showMessageDialog(
+                    this,
+                    "Please select a product from the table first.",
+                    "No Product Selected",
+                    JOptionPane.WARNING_MESSAGE
+            );
+            return;
+        }
+
+        String productName = txtProductName.getText().trim();
+        String description = txtDescription.getText().trim();
+        String priceText = txtPrice.getText().trim();
+        String stockText = txtStock.getText().trim();
+
+        Category selectedCategory
+                = (Category) cmbCategory.getSelectedItem();
+
+        if (productName.isEmpty()
+                || priceText.isEmpty()
+                || stockText.isEmpty()
+                || selectedCategory == null) {
+
+            JOptionPane.showMessageDialog(
+                    this,
+                    "Please fill all required fields.",
+                    "Validation Error",
+                    JOptionPane.WARNING_MESSAGE
+            );
+            return;
+        }
+
+        double price;
+        int stock;
+
+        try {
+            price = Double.parseDouble(priceText);
+            stock = Integer.parseInt(stockText);
+
+        } catch (NumberFormatException e) {
+
+            JOptionPane.showMessageDialog(
+                    this,
+                    "Price must be a valid number and stock must be a whole number.",
+                    "Validation Error",
+                    JOptionPane.WARNING_MESSAGE
+            );
+            return;
+        }
+
+        if (price < 0 || stock < 0) {
+            JOptionPane.showMessageDialog(
+                    this,
+                    "Price and stock cannot be negative.",
+                    "Validation Error",
+                    JOptionPane.WARNING_MESSAGE
+            );
+            return;
+        }
+
+        Product updatedProduct = new Product(
+                selectedProduct.getProductId(),
+                selectedCategory.getCategoryId(),
+                selectedCategory.getCategoryName(),
+                productName,
+                description,
+                price,
+                stock,
+                selectedProduct.isActive()
+        );
+
+        try {
+
+            boolean updated = productDAO.updateProduct(updatedProduct);
+
+            if (updated) {
+
+                JOptionPane.showMessageDialog(
+                        this,
+                        "Product updated successfully."
+                );
+
+                loadProducts();
+                clearForm();
+
+            } else {
+
+                JOptionPane.showMessageDialog(
+                        this,
+                        "Product could not be updated.",
+                        "Update Failed",
+                        JOptionPane.ERROR_MESSAGE
+                );
+            }
+
+        } catch (SQLException e) {
+
+            JOptionPane.showMessageDialog(
+                    this,
+                    "Failed to update product.\n" + e.getMessage(),
+                    "Database Error",
+                    JOptionPane.ERROR_MESSAGE
+            );
+
+            e.printStackTrace();
+        }
+    }//GEN-LAST:event_btnUpdateActionPerformed
+
+    private void btnDeleteActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnDeleteActionPerformed
+        // TODO add your handling code here:
+        if (selectedProduct == null) {
+
+            JOptionPane.showMessageDialog(
+                    this,
+                    "Please select a product from the table first.",
+                    "No Product Selected",
+                    JOptionPane.WARNING_MESSAGE
+            );
+
+            return;
+        }
+
+        int choice = JOptionPane.showConfirmDialog(
+                this,
+                "Are you sure you want to delete "
+                + selectedProduct.getProductName() + "?",
+                "Confirm Delete",
+                JOptionPane.YES_NO_OPTION,
+                JOptionPane.WARNING_MESSAGE
+        );
+        if (choice != JOptionPane.YES_OPTION) {
+            return;
+        }
+
+        try {
+
+            boolean deleted = productDAO.deleteProduct(
+                    selectedProduct.getProductId()
+            );
+
+            if (deleted) {
+
+                JOptionPane.showMessageDialog(
+                        this,
+                        "Product deleted successfully."
+                );
+
+                loadProducts();
+                clearForm();
+
+            } else {
+
+                JOptionPane.showMessageDialog(
+                        this,
+                        "Product could not be deleted.",
+                        "Delete Failed",
+                        JOptionPane.ERROR_MESSAGE
+                );
+            }
+
+        } catch (SQLException e) {
+
+            JOptionPane.showMessageDialog(
+                    this,
+                    "Failed to delete product.\n" + e.getMessage(),
+                    "Database Error",
+                    JOptionPane.ERROR_MESSAGE
+            );
+
+            e.printStackTrace();
+        }
+
+    }//GEN-LAST:event_btnDeleteActionPerformed
 
 
     // Variables declaration - do not modify//GEN-BEGIN:variables
