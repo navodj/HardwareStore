@@ -3,7 +3,7 @@
  */
 
 package com.mycompany.hardwarestore;
-
+import com.mycompany.hardwarestore.view.LoginFrame;
 /**
  *
  * @author navod
@@ -11,7 +11,9 @@ package com.mycompany.hardwarestore;
 public class HardwareStore {
 
     public static void main(String[] args) {
-        System.out.println("Hello World!");
+        LoginFrame lgnframe = new LoginFrame();
+        
+        lgnframe.setVisible(true);
         
     }
 }

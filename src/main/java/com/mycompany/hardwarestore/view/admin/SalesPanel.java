@@ -8,6 +8,7 @@ import com.mycompany.hardwarestore.dao.OrderDAO;
 import java.util.List;
 import javax.swing.JOptionPane;
 import javax.swing.table.DefaultTableModel;
+import com.reports.SalesReportService;
 
 /**
  *
@@ -18,6 +19,8 @@ public class SalesPanel extends javax.swing.JPanel {
     /**
      * Creates new form SalesPanel
      */
+    private final SalesReportService salesReportService =
+        new SalesReportService();
     private final OrderDAO orderDAO = new OrderDAO();
 
 public SalesPanel() {
@@ -75,6 +78,7 @@ public SalesPanel() {
         btnRefresh.addActionListener(this::btnRefreshActionPerformed);
 
         btnSalesReport.setText("Sales Report");
+        btnSalesReport.addActionListener(this::btnSalesReportActionPerformed);
 
         tblSales.setModel(new javax.swing.table.DefaultTableModel(
             new Object [][] {
@@ -129,6 +133,26 @@ public SalesPanel() {
             loadSales();
 
     }//GEN-LAST:event_btnRefreshActionPerformed
+
+    private void btnSalesReportActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnSalesReportActionPerformed
+        // TODO add your handling code here:
+         try {
+
+        salesReportService.showSalesReport();
+
+    } catch (Exception e) {
+
+        JOptionPane.showMessageDialog(
+                this,
+                "Failed to generate sales report.\n"
+                + e.getMessage(),
+                "Report Error",
+                JOptionPane.ERROR_MESSAGE
+        );
+
+        e.printStackTrace();
+    }
+    }//GEN-LAST:event_btnSalesReportActionPerformed
 
 
     // Variables declaration - do not modify//GEN-BEGIN:variables
