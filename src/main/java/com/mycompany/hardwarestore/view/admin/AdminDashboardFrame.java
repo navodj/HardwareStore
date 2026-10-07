@@ -164,6 +164,7 @@ public class AdminDashboardFrame extends javax.swing.JFrame {
 
     private void btnSalesActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnSalesActionPerformed
         // TODO add your handling code here:
+        showPanel(new SalesPanel());
     }//GEN-LAST:event_btnSalesActionPerformed
 
     private void btnDashboardActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnDashboardActionPerformed

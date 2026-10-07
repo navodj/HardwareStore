@@ -9,6 +9,8 @@ import com.mycompany.hardwarestore.dao.OrderDAO;
 import com.mycompany.hardwarestore.model.Order;
 import com.mycompany.hardwarestore.model.User;
 
+import com.reports.InvoiceReportService;
+
 import java.sql.SQLException;
 import java.util.List;
 
@@ -24,6 +26,9 @@ public class MyOrdersPanel extends javax.swing.JPanel {
     /**
      * Creates new form MyOrdersPanel
      */
+    
+    private final InvoiceReportService invoiceReportService =
+        new InvoiceReportService();
     private final User loggedInUser;
 
     private final CustomerDAO customerDAO = new CustomerDAO();
@@ -128,6 +133,7 @@ public class MyOrdersPanel extends javax.swing.JPanel {
         jScrollPane1.setViewportView(tblOrders);
 
         btnViewDetails.setText("View Order Details");
+        btnViewDetails.addActionListener(this::btnViewDetailsActionPerformed);
 
         javax.swing.GroupLayout layout = new javax.swing.GroupLayout(this);
         this.setLayout(layout);
@@ -163,6 +169,48 @@ public class MyOrdersPanel extends javax.swing.JPanel {
                 .addContainerGap(199, Short.MAX_VALUE))
         );
     }// </editor-fold>//GEN-END:initComponents
+
+    private void btnViewDetailsActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnViewDetailsActionPerformed
+        // TODO add your handling code here:
+         int selectedRow = tblOrders.getSelectedRow();
+
+    if (selectedRow == -1) {
+
+        JOptionPane.showMessageDialog(
+                this,
+                "Please select an order first.",
+                "No Order Selected",
+                JOptionPane.WARNING_MESSAGE
+        );
+
+        return;
+    }
+
+    int orderId = Integer.parseInt(
+            tblOrders.getValueAt(
+                    selectedRow,
+                    0
+            ).toString()
+    );
+
+    try {
+
+        invoiceReportService.showInvoice(orderId);
+
+    } catch (Exception e) {
+
+        JOptionPane.showMessageDialog(
+                this,
+                "Failed to generate invoice.\n"
+                + e.getMessage(),
+                "Report Error",
+                JOptionPane.ERROR_MESSAGE
+        );
+
+        e.printStackTrace();
+    }
+
+    }//GEN-LAST:event_btnViewDetailsActionPerformed
 
 
     // Variables declaration - do not modify//GEN-BEGIN:variables

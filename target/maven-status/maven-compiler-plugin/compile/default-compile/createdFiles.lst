@@ -4,11 +4,13 @@ com\mycompany\hardwarestore\view\admin\AdminDashboardFrame.class
 com\mycompany\hardwarestore\view\customer\CartPanel.class
 com\mycompany\hardwarestore\dao\DashboardDAO.class
 com\mycompany\hardwarestore\view\customer\CustomerProductPanel$1.class
+com\mycompany\hardwarestore\view\admin\SalesPanel.class
 com\mycompany\hardwarestore\view\LoginFrame.class
 com\mycompany\hardwarestore\view\customer\CustomerProductPanel.class
 com\mycompany\hardwarestore\dao\CustomerDAO.class
 com\mycompany\hardwarestore\service\AuthService.class
 com\mycompany\hardwarestore\view\customer\CustomerDashboardFrame.class
+com\reports\InvoiceReportService.class
 com\mycompany\hardwarestore\dao\CategoryDAO.class
 com\mycompany\hardwarestore\model\User.class
 com\mycompany\hardwarestore\dao\ProductDAO.class
